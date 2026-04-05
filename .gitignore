@@ -4,3 +4,5 @@
 out/ 
 .gradle/ 
 build/ 
+a.txt 
+output.csv 
