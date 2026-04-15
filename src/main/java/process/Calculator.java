@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Calculator {
-    private static final Logger logger = Logger.getLogger(Calculator.class.getName());
+    private static final Logger log = Logger.getLogger(Calculator.class.getName());
     public void process(String[] args) {
         Reader reader = null;
 
@@ -25,21 +25,23 @@ public class Calculator {
                 try {
                     Operation cmd = cmdFactory.createCommand(line);
                     if (cmd != null) {
-                        cmd.apply(calculator);
+                        String[] parts = line.trim().split("\\s+");
+                        cmd.apply(calculator, parts);
+                        log.info("Executed: " + line);
                     }
                 }
                 catch (Exception e) {
                     System.err.println("Error processing line: " + line);
-                    logger.log(Level.SEVERE, "Error processing line: " + line, e);
+                    log.log(Level.SEVERE, "Error processing line: " + line, e);
                 }
 
             }
         } catch (CalculatorIOException e) {
             System.err.println("Error: " + e.getMessage());
-            logger.log(Level.SEVERE, "IO Error", e);
+            log.log(Level.SEVERE, "IO Error", e);
         } catch (Exception e) {
             System.err.println("Unexpected error: " + e.getMessage());
-            logger.log(Level.SEVERE, "Unexpected error", e);
+            log.log(Level.SEVERE, "Unexpected error", e);
         } finally {
             if (reader != null) {
                 reader.close();

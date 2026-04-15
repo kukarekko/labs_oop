@@ -1,13 +1,9 @@
 package factory;
 
 import commands.Operation;
-import commands.Push;
-import commands.Define;
 import exceptions.calculator.CalculatorIOException;
-import exceptions.command.CommandException;
 import exceptions.command.CommandInstantiationException;
 import exceptions.command.CommandNotFoundException;
-import exceptions.variable.InvalidNumberFormatException;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -17,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CommandFactory {
-    private static final Logger logger = Logger.getLogger(CommandFactory.class.getName());
+    private static final Logger log = Logger.getLogger(CommandFactory.class.getName());
 
     private static CommandFactory instance;
     private final Map<String, Class<? extends Operation>> commands = new HashMap<>();
@@ -38,18 +34,18 @@ public class CommandFactory {
 
                     if (Operation.class.isAssignableFrom(clas)) {
                         commands.put(key, clas.asSubclass(Operation.class));
-                        logger.info("Registered command: " + key + " -> " + className);
+                        log.info("Registered command: " + key + " -> " + className);
                     } else {
-                        logger.warning("Class " + className + " is not an operation");
+                        log.warning("Class " + className + " is not an operation");
                     }
                 } catch (ClassNotFoundException e) {
-                    logger.log(Level.SEVERE, "Class not found: " + className, e);
+                    log.log(Level.SEVERE, "Class not found: " + className, e);
                 }
             }
-            logger.info("CommandFactory initialized with " + commands.size() + " commands");
+            log.info("CommandFactory initialized with " + commands.size() + " commands");
 
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to initialize CommandFactory", e);
+            log.log(Level.SEVERE, "Failed to initialize CommandFactory", e);
             throw new CalculatorIOException("Failed to initialize CommandFactory", e);
         }
     }
@@ -63,11 +59,13 @@ public class CommandFactory {
 
     public Operation createCommand(String line) throws Exception {
         if (line == null || line.trim().isEmpty()) {
+            log.fine("Empty line, skipping");
             return null;
         }
 
         String trimmedLine = line.trim();
         if (trimmedLine.startsWith("#")) {
+            log.fine("Comment line: " + trimmedLine);
             return null;
         }
 
@@ -76,13 +74,16 @@ public class CommandFactory {
 
         Class<? extends Operation> clas = commands.get(commandName);
         if (clas == null) {
+            log.warning("Command not found: " + commandName);
             throw new CommandNotFoundException(commandName, line);
         }
 
         try {
-            return clas.getDeclaredConstructor(String[].class).newInstance((Object) parts);
+            Operation cmd = clas.getDeclaredConstructor().newInstance();
+            log.info("Created command: " + commandName);
+            return cmd;
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to instantiate command: " + commandName, e);
+            log.log(Level.SEVERE, "Failed to instantiate command: " + commandName, e);
             throw new CommandInstantiationException(commandName, line, e);
         }
     }

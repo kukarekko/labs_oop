@@ -2,17 +2,20 @@ package commands;
 
 import exceptions.stack.StackUnderflowException;
 import stack.StackCalculator;
+import java.util.logging.Logger;
 
 public class Multiply implements Operation {
-    public Multiply(String[] args) {
+    private static final Logger log = Logger.getLogger(Multiply.class.getName());
+    @Override
+    public void apply(StackCalculator stack, String[] args) {
         if (args.length != 1) {
+            log.warning("MULTIPLY: invalid arguments count");
             throw new StackUnderflowException();
         }
-    }
-    @Override
-    public void apply(StackCalculator stack) {
         Double a = stack.pop();
         Double b = stack.pop();
-        stack.push(a * b);
+        double result = a * b;
+        stack.push(result);
+        log.info("MULTIPLY: " + a + " * " + b + " = " + result);
     }
 }

@@ -2,26 +2,24 @@ package commands;
 
 import exceptions.stack.StackUnderflowException;
 import stack.StackCalculator;
+import java.util.logging.Logger;
 import exceptions.variable.InvalidNumberFormatException;
 
 public class Define implements Operation {
-    private String name;
-    private Double value;
-
-    public Define(String[] args) {
+    private static final Logger log = Logger.getLogger(Define.class.getName());
+    @Override
+    public void apply(StackCalculator stack, String[] args) {
         if (args.length < 3) {
             throw new StackUnderflowException();
         }
-        this.name = args[1];
+        String name = args[1];
         try {
-            this.value = Double.parseDouble(args[2]);
+            double value = Double.parseDouble(args[2]);
+            stack.define(name, value);
+            log.info("Variable defined: " + name + " = " + value);
         } catch (NumberFormatException e) {
+            log.warning("Bad number: " + args[2]);
             throw new InvalidNumberFormatException(args[2]);
         }
-    }
-
-    @Override
-    public void apply(StackCalculator stack) {
-        stack.define(name, value);
     }
 }
