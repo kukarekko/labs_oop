@@ -40,4 +40,8 @@ bin/
 .vscode/
 
 ### Mac OS ###
-.DS_Store
+.DS_Store".gradle/" 
+"build/" 
+".idea/" 
+"scores.dat" 
+"*.log" 
